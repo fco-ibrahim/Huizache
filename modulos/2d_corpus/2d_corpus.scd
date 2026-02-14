@@ -1,5 +1,9 @@
+//VIDEO 5
+//En este video se utilizará un tipo distinto de análisis (MFCC)
+
 s.options.sampleRate = 48000;
 s.reboot;
+"Hola".postln;
 
 (
 ~sampleFlight = {
@@ -13,15 +17,34 @@ s.reboot;
 
 		if(loader.buffer.numChannels > 1){
 			src = Buffer(s);
-			FluidBufCompose.processBlocking(s, loader.buffer, startChan: 0,numChans: 1,destination: src, gain: -6.dbamp);
-			FluidBufCompose.processBlocking(s, loader.buffer, startChan: 1,numChans: 1,destination: src, gain: -6.dbamp,destGain: 1)}
-		{src = loader.buffer};
+			loader.buffer.numChannels.do{
+				|chan|
+				FluidBufCompose.processBlocking(s,
+					loader.buffer,
+					startChan: chan,
+					numChans: 1,
+					destination: src,
+					gain: loader.buffer.numChannels.reciprocal,
+					destGain: 1);
+				"Canal % reducido a mono correctamente".format(chan + 1).postln; "".postln
+			}
+		}
+		{
+			"Buffer previamente en mono".postln;
+			"".postln;
+			src = loader.buffer
+		};
 
-		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh,indices: indices, action: {
-			"Cortes establecidos correctamente".postln;
-			"Segundos promedio de cada bloque: %".format(src.duration/indices.numFrames).postln;
-		});
+		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh,indices: indices);
 
+		"Cortes establecidos correctamente".postln;
+		"".postln;
+
+		/* Investigar cómo corregir esto
+		"Número de cortes: %".format(indices.numFrames).postln;
+		"".postln;
+		"Segundos promedio de cada bloque: %".format(src.duration / indices.numFrames + 1).postln;
+		"".postln; */
 
 		play_slice = {
 			arg index;
@@ -57,14 +80,7 @@ s.reboot;
 					var num = final - inicio;
 					var porcentaje, barras;
 
-					FluidBufSpectralShape.processBlocking(s, src, inicio, num, features: spec, select:[\centroid]);
-					FluidBufStats.processBlocking(s,spec,stats: stats, select: [\mean]);
-
-					FluidBufLoudness.processBlocking(s,src, inicio, num,features: loudness, select: [\loudness]);
-					FluidBufStats.processBlocking(s,loudness,stats: stats2, select: [\mean]);
-
-					FluidBufCompose.processBlocking(s, stats, destination: point, destStartFrame: 0);
-					FluidBufCompose.processBlocking(s, stats2, destination: point, destStartFrame: 1);
+					FluidBufMFCC
 
 					analyses.addPoint(index, point);
 					"Progreso: % porciento (% de %)".format(
@@ -113,4 +129,4 @@ s.reboot;
 )
 
 
-~sampleFlight.("/Users/ibrahim/Downloads/grabacionesDeCampo/", 0.5);
+~sampleFlight.(FluidFilesPath(), 0.5);
