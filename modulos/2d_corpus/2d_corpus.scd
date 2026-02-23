@@ -1,9 +1,15 @@
 //VIDEO 5
 //En este video se utilizará un tipo distinto de análisis (MFCC)
 
+
+//Sample rate para mis audios
 s.options.sampleRate = 48000;
+
+//Sample rate para tutorial
+s.options.sampleRate = 44100;
+
+//Iniciar servidor
 s.reboot;
-"Hola".postln;
 
 (
 ~sampleFlight = {
@@ -35,16 +41,17 @@ s.reboot;
 			src = loader.buffer
 		};
 
-		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh,indices: indices);
+		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh, indices: indices);
 
 		"Cortes establecidos correctamente".postln;
 		"".postln;
 
-		/* Investigar cómo corregir esto
+		s.sync;
+
 		"Número de cortes: %".format(indices.numFrames).postln;
 		"".postln;
 		"Segundos promedio de cada bloque: %".format(src.duration / indices.numFrames + 1).postln;
-		"".postln; */
+		"".postln;
 
 		play_slice = {
 			arg index;
@@ -64,25 +71,29 @@ s.reboot;
 		};
 
 		analyses = FluidDataSet(s);
+
 		"Iniciando creación de dataset".postln;
 		"".postln;
+
 		indices.loadToFloatArray(action: {
 			|fa|
+			var umapped = FluidDataSet(s);
+
 			fork {
-				var spec = Buffer(s);
+				var mfccs = Buffer(s);
 				var stats = Buffer(s);
-				var stats2 = Buffer(s);
-				var loudness = Buffer(s);
-				var point = Buffer(s);
+				var flat = Buffer(s);
 
 				fa.doAdjacentPairs{
 					|inicio, final, index|
 					var num = final - inicio;
-					var porcentaje, barras;
 
-					FluidBufMFCC
+					FluidBufMFCC.processBlocking(s, src, inicio, num, features: mfccs, numCoeffs: 13, startCoeff: 1);
+					FluidBufStats.processBlocking(s,source: mfccs, stats: stats, select: [\mean]);
+					FluidBufFlatten.processBlocking(s,source: stats, destination: flat);
 
-					analyses.addPoint(index, point);
+					analyses.addPoint(index, flat);
+
 					"Progreso: % porciento (% de %)".format(
 						((index + 1) / fa.size * 100).round(0.01),
 						index + 1,
@@ -96,8 +107,10 @@ s.reboot;
 				s.sync;
 				analyses.print;
 
+				FluidUMAP(s, numNeighbours:15,minDist:0.9).fitTransform(analyses, umapped, {"Umap generado".postln});
+
 				normed = FluidDataSet(s);
-				FluidNormalize(s).fitTransform(analyses, normed);
+				FluidNormalize(s).fitTransform(umapped, normed, {"Data Set normalizado correctamente"});
 
 				tree = FluidKDTree(s);
 				tree.fit(normed);
@@ -129,4 +142,4 @@ s.reboot;
 )
 
 
-~sampleFlight.(FluidFilesPath(), 0.5);
+~sampleFlight.(FluidFilesPath(), 0.05);
