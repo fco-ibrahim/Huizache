@@ -1,11 +1,21 @@
+//VIDEO 5
+//En este video se utilizará un tipo distinto de análisis (MFCC)
+
+
+//Sample rate para mis audios
 s.options.sampleRate = 48000;
+
+//Sample rate para tutorial
+s.options.sampleRate = 44100;
+
+//Iniciar servidor
 s.reboot;
 
 (
 ~sampleFlight = {
 	|folder, tresh = 0.05|
 	fork {
-		var loader = FluidLoadFolder(folder).play(s, {"Folder cargado al servidor correctamente".postln;"".postln});
+		var loader = FluidLoadFolder(folder).play(s, {"Folder cargado al servidor correctamente".postln;});
 		var indices = Buffer(s);
 		var src, play_slice, analyses, normed, tree;
 
@@ -13,15 +23,35 @@ s.reboot;
 
 		if(loader.buffer.numChannels > 1){
 			src = Buffer(s);
-			FluidBufCompose.processBlocking(s, loader.buffer, startChan: 0,numChans: 1,destination: src, gain: -6.dbamp);
-			FluidBufCompose.processBlocking(s, loader.buffer, startChan: 1,numChans: 1,destination: src, gain: -6.dbamp,destGain: 1)}
-		{src = loader.buffer};
+			loader.buffer.numChannels.do{
+				|chan|
+				FluidBufCompose.processBlocking(s,
+					loader.buffer,
+					startChan: chan,
+					numChans: 1,
+					destination: src,
+					gain: loader.buffer.numChannels.reciprocal,
+					destGain: 1);
+				"Canal % reducido a mono correctamente".format(chan + 1).postln; "".postln
+			}
+		}
+		{
+			"Buffer previamente en mono".postln;
+			"".postln;
+			src = loader.buffer
+		};
 
-		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh,indices: indices, action: {
-			"Cortes establecidos correctamente".postln;
-			"Segundos promedio de cada bloque: %".format(src.duration/indices.numFrames).postln;
-		});
+		FluidBufOnsetSlice.processBlocking(s,src,metric: 9,threshold: tresh, indices: indices);
 
+		"Cortes establecidos correctamente".postln;
+		"".postln;
+
+		s.sync;
+
+		"Número de cortes: %".format(indices.numFrames).postln;
+		"".postln;
+		"Segundos promedio de cada bloque: %".format(src.duration / indices.numFrames + 1).postln;
+		"".postln;
 
 		play_slice = {
 			arg index;
@@ -41,32 +71,29 @@ s.reboot;
 		};
 
 		analyses = FluidDataSet(s);
+
 		"Iniciando creación de dataset".postln;
 		"".postln;
+
 		indices.loadToFloatArray(action: {
 			|fa|
+			var umapped = FluidDataSet(s);
+
 			fork {
-				var spec = Buffer(s);
+				var mfccs = Buffer(s);
 				var stats = Buffer(s);
-				var stats2 = Buffer(s);
-				var loudness = Buffer(s);
-				var point = Buffer(s);
+				var flat = Buffer(s);
 
 				fa.doAdjacentPairs{
 					|inicio, final, index|
 					var num = final - inicio;
-					var porcentaje, barras;
 
-					FluidBufSpectralShape.processBlocking(s, src, inicio, num, features: spec, select:[\centroid]);
-					FluidBufStats.processBlocking(s,spec,stats: stats, select: [\mean]);
+					FluidBufMFCC.processBlocking(s, src, inicio, num, features: mfccs, numCoeffs: 13, startCoeff: 1);
+					FluidBufStats.processBlocking(s,source: mfccs, stats: stats, select: [\mean]);
+					FluidBufFlatten.processBlocking(s,source: stats, destination: flat);
 
-					FluidBufLoudness.processBlocking(s,src, inicio, num,features: loudness, select: [\loudness]);
-					FluidBufStats.processBlocking(s,loudness,stats: stats2, select: [\mean]);
+					analyses.addPoint(index, flat);
 
-					FluidBufCompose.processBlocking(s, stats, destination: point, destStartFrame: 0);
-					FluidBufCompose.processBlocking(s, stats2, destination: point, destStartFrame: 1);
-
-					analyses.addPoint(index, point);
 					"Progreso: % porciento (% de %)".format(
 						((index + 1) / fa.size * 100).round(0.01),
 						index + 1,
@@ -80,8 +107,10 @@ s.reboot;
 				s.sync;
 				analyses.print;
 
+				FluidUMAP(s, numNeighbours:15,minDist:0.9).fitTransform(analyses, umapped, {"Umap generado".postln});
+
 				normed = FluidDataSet(s);
-				FluidNormalize(s).fitTransform(analyses, normed);
+				FluidNormalize(s).fitTransform(umapped, normed, {"Data Set normalizado correctamente"});
 
 				tree = FluidKDTree(s);
 				tree.fit(normed);
@@ -113,4 +142,5 @@ s.reboot;
 )
 
 
-~sampleFlight.("/Users/ibrahim/Downloads/grabacionesDeCampo/", 0.5);
+~sampleFlight.(FluidFilesPath(), 0.05);
+~sampleFlight.("Directorio-con/carpeta-con-todas/las-grabaciones-a/utilizar", 0.5);
