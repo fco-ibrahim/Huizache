@@ -27,7 +27,7 @@ Inicialmente se planeta el diseño de una interfaz modular estable basada en [Li
 Se espera obtener un sistema funcional que unifique expresividad, estabilidad y control, así como generar documentación que contribuya al ámbito académico del desarrollo de las interfaces musicales digitales y el software libre desde un contexto mexicano. 
 
 ## Vachellia farnesiana
-![Huizache](recursos/huizache.heic)
+![Huizache](recursos/huizache.png)
 
 El huizache (_Vachellia farnesiana_) es un arbusto espinoso nativo de México, presente en zonas áridas y semiáridas del territorio. Crece donde otras plantas no: suelos erosionados, orillas de camino y llanos de matorral. Fija nitrógeno en el suelo y prepara el terreno para otras especies. Florece en pequeñas esferas amarillas aromáticas. No es una planta de jardín, y su valor no depende de que alguien la haya sembrado.
 
