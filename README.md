@@ -6,6 +6,20 @@ Forma parte de la documentación y enfoque abierto de mi tesis _**Huizache: dise
 
 Se planeta el diseño de una interfaz modular estable basada en el trabajo de Sam Pluta, con módulos iniciales de sampleo, síntesis aditiva y clasificación de grabaciones de campo en un espacio bidimensional según sus caraterísticas tímbricas. 
 
+```text 
+                           *
+             *        *   .      *        *
+               .*       * :  *     *  *.*
+             * :  *      :;*    .;::""       .*
+         *...   ::    *.   "#.* /;     *   .*
+             `...::.  : *   :#:#.    * .:""
+                  ";:"    .##:   * .:"  *
+                 *   ":#.:#######::"´  
+                        ":###;"
+                        ,#####.
+          /\/\/\/\/\/\/.######.\/\/\/\/\/\/\
+```
+
 .
 
 .
@@ -22,18 +36,6 @@ Se planeta el diseño de una interfaz modular estable basada en el trabajo de Sa
 
 . 
 
-```text 
-                   *
-     *        *   .      *        *
-       .*       * :  *     *  *.*
-     * :  *      :;*    .;::""       .*
- *...   ::    *.   "#.* /;     *   .*
-     `...::.  : *   :#:#.    * .:""
-          ";:"    .##:   * .:"  *
-         *   ":#.:#######::"´  
-                ":###;"
-                ,#####.
-  /\/\/\/\/\/\/.######.\/\/\/\/\/\/\
-```
+
 
         ¿Qué culpa tiene el huizache de haber nacido en el llano?
