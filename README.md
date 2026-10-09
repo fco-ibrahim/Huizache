@@ -20,7 +20,20 @@ Se planeta el diseño de una interfaz modular estable basada en el trabajo de Sa
 
 .
 
-.
+. 
 
-**¿Qué culpa tiene el huizache de haber nacido en el llano?**
+```text 
+                   *
+     *        *   .      *        *
+       .*       * :  *     *  *.*
+     * :  *      :;*    .;::""       .*
+ *...   ::    *.   "#.* /;     *   .*
+     `...::.  : *   :#:#.    * .:""
+          ";:"    .##:   * .:"  *
+         *   ":#.:#######::"´  
+                ":###;"
+                ,#####.
+  /\/\/\/\/\/\/.######.\/\/\/\/\/\/\
+```
 
+        ¿Qué culpa tiene el huizache de haber nacido en el llano?
