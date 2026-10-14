@@ -11,6 +11,3 @@ NodeTreeView(s).start;
 ~randRateHi = 3.0;
 ~randDeltaLo = 0.02;
 ~randDeltaHi = 0.2;
-
-//Liberar nodo 
-s.sendMsg(\n_free, 1028);
