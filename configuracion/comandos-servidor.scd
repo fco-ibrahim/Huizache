@@ -19,7 +19,10 @@ s.options.dump;
 "open -a 'Audio MIDI Setup'".unixCmd;
 
 //Tamaño de la memoria
-s.options.memSize_(100000);
+s.options.memSize_();
 
 //GUI de servidor
 s.makeGUI;
+
+//Liberar nodo 
+s.sendMsg(\n_free, 1028);
