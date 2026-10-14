@@ -1,11 +1,7 @@
-//VIDEO 5
-//En este video se utilizará un tipo distinto de análisis (MFCC)
-
-
 //Sample rate para mis audios
 s.options.sampleRate = 48000;
 
-//Sample rate para tutorial
+//Sample rate de tutorial
 s.options.sampleRate = 44100;
 
 //Iniciar servidor
